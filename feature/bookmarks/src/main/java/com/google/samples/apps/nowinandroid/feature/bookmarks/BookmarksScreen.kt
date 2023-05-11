@@ -18,12 +18,14 @@ package com.google.samples.apps.nowinandroid.feature.bookmarks
 
 import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -65,6 +67,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.samples.apps.nowinandroid.core.designsystem.component.NiaLoadingWheel
+import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar.FastScrollbar
+import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar.rememberThumbInteractions
+import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar.scrollbarState
 import com.google.samples.apps.nowinandroid.core.designsystem.theme.LocalTintTheme
 import com.google.samples.apps.nowinandroid.core.designsystem.theme.NiaTheme
 import com.google.samples.apps.nowinandroid.core.model.data.UserNewsResource
@@ -123,8 +128,13 @@ internal fun BookmarksScreen(
                 duration = Short,
             )
             when (snackBarResult) {
-                ActionPerformed -> { undoBookmarkRemoval() }
-                else -> { clearUndoState() }
+                ActionPerformed -> {
+                    undoBookmarkRemoval()
+                }
+
+                else -> {
+                    clearUndoState()
+                }
             }
         }
     }
@@ -142,12 +152,20 @@ internal fun BookmarksScreen(
 
     Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) {
         Box(
-            modifier = Modifier.padding(it).fillMaxSize(),
+            modifier = Modifier
+                .padding(it)
+                .fillMaxSize(),
         ) {
             when (feedState) {
                 Loading -> LoadingState(modifier)
                 is Success -> if (feedState.feed.isNotEmpty()) {
-                    BookmarksGrid(feedState, removeFromBookmarks, onNewsResourceViewed, onTopicClick, modifier)
+                    BookmarksGrid(
+                        feedState,
+                        removeFromBookmarks,
+                        onNewsResourceViewed,
+                        onTopicClick,
+                        modifier,
+                    )
                 } else {
                     EmptyState(modifier)
                 }
@@ -178,25 +196,49 @@ private fun BookmarksGrid(
 ) {
     val scrollableState = rememberLazyGridState()
     TrackScrollJank(scrollableState = scrollableState, stateName = "bookmarks:grid")
-    LazyVerticalGrid(
-        columns = Adaptive(300.dp),
-        contentPadding = PaddingValues(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(32.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
-        state = scrollableState,
+    Box(
         modifier = modifier
-            .fillMaxSize()
-            .testTag("bookmarks:feed"),
+            .fillMaxSize(),
     ) {
-        newsFeed(
-            feedState = feedState,
-            onNewsResourcesCheckedChanged = { id, _ -> removeFromBookmarks(id) },
-            onNewsResourceViewed = onNewsResourceViewed,
-            onTopicClick = onTopicClick,
-        )
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.safeDrawing))
+        LazyVerticalGrid(
+            columns = Adaptive(300.dp),
+            contentPadding = PaddingValues(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(32.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
+            state = scrollableState,
+            modifier = Modifier
+                .fillMaxSize()
+                .testTag("bookmarks:feed"),
+        ) {
+            newsFeed(
+                feedState = feedState,
+                onNewsResourcesCheckedChanged = { id, _ -> removeFromBookmarks(id) },
+                onNewsResourceViewed = onNewsResourceViewed,
+                onTopicClick = onTopicClick,
+            )
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.safeDrawing))
+            }
         }
+        val itemsAvailable = when (feedState) {
+            Loading -> 1
+            is Success -> feedState.feed.size
+        }
+        val scrollbarState = scrollableState.scrollbarState(
+            itemsAvailable = itemsAvailable,
+        )
+        FastScrollbar(
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(horizontal = 2.dp)
+                .align(Alignment.CenterEnd),
+            state = scrollbarState,
+            orientation = Orientation.Vertical,
+            scrollInProgress = scrollableState.isScrollInProgress,
+            onThumbMoved = scrollableState.rememberThumbInteractions(
+                itemsAvailable = itemsAvailable,
+            ),
+        )
     }
 }
 
