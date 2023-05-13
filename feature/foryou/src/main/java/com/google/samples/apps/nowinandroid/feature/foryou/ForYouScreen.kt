@@ -92,7 +92,7 @@ import com.google.samples.apps.nowinandroid.core.designsystem.component.NiaIconT
 import com.google.samples.apps.nowinandroid.core.designsystem.component.NiaOverlayLoadingWheel
 import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar.DecorativeScrollbar
 import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar.FastScrollbar
-import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar.rememberThumbInteractions
+import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar.rememberFastScroller
 import com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar.scrollbarState
 import com.google.samples.apps.nowinandroid.core.designsystem.icon.NiaIcons
 import com.google.samples.apps.nowinandroid.core.designsystem.theme.NiaTheme
@@ -238,7 +238,7 @@ internal fun ForYouScreen(
             state = scrollbarState,
             orientation = Orientation.Vertical,
             scrollInProgress = state.isScrollInProgress,
-            onThumbMoved = state.rememberThumbInteractions(
+            onThumbDisplaced = state.rememberFastScroller(
                 itemsAvailable = itemsAvailable,
             ),
         )

@@ -59,7 +59,7 @@ private const val INACTIVE_TO_DORMANT_COOL_DOWN = 2_000L
  * @param scrollInProgress a flag indicating if the scrolling container for the scrollbar is
  * currently scrolling
  * @param orientation the orientation of the scrollbar
- * @param onThumbMoved the fast scroll implementation
+ * @param onThumbDisplaced the fast scroll implementation
  */
 @Composable
 fun FastScrollbar(
@@ -67,7 +67,7 @@ fun FastScrollbar(
     state: ScrollbarState,
     scrollInProgress: Boolean,
     orientation: Orientation,
-    onThumbMoved: (Float) -> Unit,
+    onThumbDisplaced: (Float) -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     Scrollbar(
@@ -82,7 +82,7 @@ fun FastScrollbar(
                 orientation = orientation,
             )
         },
-        onThumbDisplaced = onThumbMoved,
+        onThumbDisplaced = onThumbDisplaced,
     )
 }
 
