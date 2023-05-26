@@ -73,6 +73,7 @@ import com.google.samples.apps.nowinandroid.core.designsystem.icon.Icon.ImageVec
 import com.google.samples.apps.nowinandroid.core.designsystem.icon.NiaIcons
 import com.google.samples.apps.nowinandroid.core.designsystem.theme.GradientColors
 import com.google.samples.apps.nowinandroid.core.designsystem.theme.LocalGradientColors
+import com.google.samples.apps.nowinandroid.feature.search.navigation.navigateToSearch
 import com.google.samples.apps.nowinandroid.feature.settings.SettingsDialog
 import com.google.samples.apps.nowinandroid.navigation.NiaNavHost
 import com.google.samples.apps.nowinandroid.navigation.TopLevelDestination
@@ -94,15 +95,13 @@ fun NiaApp(
         userNewsResourceRepository = userNewsResourceRepository,
     ),
 ) {
-    val shouldShowGradientBackground =
-        appState.currentTopLevelDestination == TopLevelDestination.FOR_YOU
     var showSettingsDialog by rememberSaveable {
         mutableStateOf(false)
     }
 
     NiaBackground {
         NiaGradientBackground(
-            gradientColors = if (shouldShowGradientBackground) {
+            gradientColors = if (appState.shouldShowGradientBackground) {
                 LocalGradientColors.current
             } else {
                 GradientColors()
@@ -144,7 +143,7 @@ fun NiaApp(
                             destinations = appState.topLevelDestinations,
                             destinationsWithUnreadResources = unreadDestinations,
                             onNavigateToDestination = appState::navigateToTopLevelDestination,
-                            currentDestination = appState.currentDestination,
+                            currentDestination = appState.currentBackStackEntry?.destination,
                             modifier = Modifier.testTag("NiaBottomBar"),
                         )
                     }
@@ -165,7 +164,7 @@ fun NiaApp(
                         NiaNavRail(
                             destinations = appState.topLevelDestinations,
                             onNavigateToDestination = appState::navigateToTopLevelDestination,
-                            currentDestination = appState.currentDestination,
+                            currentDestination = appState.currentBackStackEntry?.destination,
                             modifier = Modifier
                                 .testTag("NiaNavRail")
                                 .safeDrawingPadding(),
@@ -190,11 +189,11 @@ fun NiaApp(
                                     containerColor = Color.Transparent,
                                 ),
                                 onActionClick = { showSettingsDialog = true },
-                                onNavigationClick = { appState.navigateToSearch() },
+                                onNavigationClick = { appState.navController.navigateToSearch() },
                             )
                         }
 
-                        NiaNavHost(appState)
+                        NiaNavHost(appState, snackbarHostState)
                     }
 
                     // TODO: We may want to add padding or spacer when the snackbar is shown so that

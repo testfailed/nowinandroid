@@ -17,6 +17,7 @@
 package com.google.samples.apps.nowinandroid.feature.bookmarks
 
 import androidx.activity.ComponentActivity
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.filter
@@ -50,6 +51,7 @@ class BookmarksScreenTest {
         composeTestRule.setContent {
             BookmarksScreen(
                 feedState = NewsFeedUiState.Loading,
+                snackbarHostState = SnackbarHostState(),
                 removeFromBookmarks = {},
                 onTopicClick = {},
                 onNewsResourceViewed = {},
@@ -70,6 +72,7 @@ class BookmarksScreenTest {
                 feedState = NewsFeedUiState.Success(
                     userNewsResourcesTestData.take(2),
                 ),
+                snackbarHostState = SnackbarHostState(),
                 removeFromBookmarks = {},
                 onTopicClick = {},
                 onNewsResourceViewed = {},
@@ -110,6 +113,7 @@ class BookmarksScreenTest {
                 feedState = NewsFeedUiState.Success(
                     userNewsResourcesTestData.take(2),
                 ),
+                snackbarHostState = SnackbarHostState(),
                 removeFromBookmarks = { newsResourceId ->
                     assertEquals(userNewsResourcesTestData[0].id, newsResourceId)
                     removeFromBookmarksCalled = true
@@ -144,6 +148,7 @@ class BookmarksScreenTest {
         composeTestRule.setContent {
             BookmarksScreen(
                 feedState = NewsFeedUiState.Success(emptyList()),
+                snackbarHostState = SnackbarHostState(),
                 removeFromBookmarks = {},
                 onTopicClick = {},
                 onNewsResourceViewed = {},

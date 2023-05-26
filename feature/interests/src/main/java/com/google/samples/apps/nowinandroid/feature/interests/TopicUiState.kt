@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-import com.android.build.api.dsl.ManagedVirtualDevice
+package com.google.samples.apps.nowinandroid.feature.interests
 
-plugins {
-    id("nowinandroid.android.feature")
-    id("nowinandroid.android.library.compose")
-    id("nowinandroid.android.library.jacoco")
-}
+import com.google.samples.apps.nowinandroid.core.model.data.FollowableTopic
+import com.google.samples.apps.nowinandroid.core.model.data.UserNewsResource
 
-android {
-    namespace = "com.google.samples.apps.nowinandroid.feature.topic"
-}
+sealed interface TopicUiState {
+    data class Success(
+        val followableTopic: FollowableTopic,
+        val newsResources: List<UserNewsResource>,
+    ) : TopicUiState
 
-dependencies {
-    implementation(libs.kotlinx.datetime)
+    object Error : TopicUiState
+    object Loading : TopicUiState
 }
